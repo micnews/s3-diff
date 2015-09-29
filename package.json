@@ -1,6 +1,6 @@
 {
   "name": "s3-diff",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Get the diff between a s3-folder and a local folder",
   "main": "index.js",
   "scripts": {
