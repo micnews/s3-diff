@@ -26,9 +26,11 @@ module.exports = function (opts, cb) {
 };
 
 function formatResults (results) {
-  var s3Files = results.s3Files.map(function (obj) {
-    return obj.key;
-  });
+  var s3Files = results.s3Files
+    .map(function (obj) {
+      return obj.key;
+    })
+    .filter(Boolean);
   var localFiles = results.localFiles;
   var intersect = intersection(s3Files, localFiles);
   var missing = difference(s3Files, intersect);
