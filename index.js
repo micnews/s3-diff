@@ -70,9 +70,10 @@ function s3Files (s3, opts) {
 
 function formatDataContents (prefix, contents) {
   return contents.map(function (obj) {
+    console.log(obj);
     return {
       key: obj.Key.slice(prefix.length + 1),
-      etag: obj.Etag
+      etag: obj.ETag
     };
   });
 }
