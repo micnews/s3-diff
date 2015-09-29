@@ -19,5 +19,10 @@
   "bugs": {
     "url": "https://github.com/micnews/s3-diff/issues"
   },
-  "homepage": "https://github.com/micnews/s3-diff#readme"
+  "homepage": "https://github.com/micnews/s3-diff#readme",
+  "dependencies": {
+    "aws-sdk": "^2.2.4",
+    "run-auto": "^1.1.3",
+    "set": "^1.1.1"
+  }
 }
