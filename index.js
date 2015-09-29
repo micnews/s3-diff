@@ -1,54 +1,49 @@
 'use strict';
 
 var AWS = require('aws-sdk');
-var auto = require('run-auto');
 var fs = require('fs');
-var Set = require('set');
 var getChanged = require('./lib/changed');
+var intersection = require('lodash.intersection');
+var difference = require('lodash.difference');
+var auto = require('run-auto');
 
 module.exports = function (opts, cb) {
   var s3 = new AWS.S3(opts.aws);
   auto({
-    missing: ['listLocalSet', 'listS3Set', function (done, results) {
-      var intersect = results.listLocalSet.intersect(results.listS3Set);
-      done(null, results.listS3Set.difference(intersect).get());
-    }],
-    extra: ['listLocalSet', 'listS3Set', function (done, results) {
-      var intersect = results.listLocalSet.intersect(results.listS3Set);
-      done(null, results.listLocalSet.difference(intersect).get());
-    }],
-    changed: ['listLocal', 'listS3', function (done, results) {
+    localFiles: localFiles(opts),
+    s3Files: s3Files(s3, opts),
+    changed: ['localFiles', 's3Files', function (done, results) {
       getChanged(
-        results.listS3,
+        results.s3Files,
         opts.local,
-        results.listLocal,
+        results.localFiles,
         done
       );
-    }],
-    listLocal: listLocal(opts),
-    listLocalSet: ['listLocal', function (done, results) {
-      done(null, new Set(results.listLocal));
-    }],
-    listS3: listS3(s3, opts),
-    listS3Set: ['listS3', function (done, results) {
-      done(null, new Set(results.listS3.map(function (obj) {
-        return obj.key;
-      }).filter(Boolean)));
-    }]
+    } ]
   }, function (err, results) {
     cb(err, results && formatResults(results));
   });
 };
 
 function formatResults (results) {
+  var s3Files = results.s3Files.map(function (obj) {
+    return obj.key;
+  });
+  var localFiles = results.localFiles;
+  var intersect = intersection(s3Files, localFiles);
+  var missing = difference(s3Files, intersect);
+  var extra = difference(localFiles, intersect);
+  var keep = difference(intersect, results.changed);
+
   return {
-    missing: results.missing,
-    extra: results.extra,
-    changed: results.changed
+    missing: missing,
+    extra: extra,
+    changed: results.changed,
+    keep: keep
   };
 }
 
-function listLocal (opts) {
+function localFiles (opts) {
   return function (cb) {
     fs.readdir(opts.local, function (err, files) {
       if (err && err.code === 'ENOENT') {
@@ -60,7 +55,7 @@ function listLocal (opts) {
   };
 }
 
-function listS3 (s3, opts) {
+function s3Files (s3, opts) {
   return function (cb) {
     var params = {
       Bucket: opts.remote.bucket,
