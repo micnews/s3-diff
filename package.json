@@ -4,7 +4,7 @@
   "description": "Get the diff between a s3-folder and a local folder",
   "main": "index.js",
   "scripts": {
-    "test": "tape test/*-test.js"
+    "test": "semistandard && tape test/*-test.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "run-auto": "^1.1.3"
   },
   "devDependencies": {
+    "semistandard": "^7.0.2",
     "tape": "^4.2.0"
   }
 }
