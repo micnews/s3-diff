@@ -55,7 +55,7 @@ function localFiles (opts) {
              arr.push(file.replace(opts.local + '/', ''));
            }
            return arr;
-         }, []);
+         }, [])
       );
     });
   };
