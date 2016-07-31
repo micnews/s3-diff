@@ -47,30 +47,15 @@ function formatResults (results) {
 }
 
 function localFiles (opts) {
-  //TODO add globbing
   return function (cb) {
-
-    // fs.readdir(opts.local, function (err, files) {
-    //   if (err && err.code === 'ENOENT') {
-    //     err = null;
-    //     files = [];
-    //   }
-    //   cb(err, files);
-    // });
     glob(opts.local + "/**/*", function (err, files) {
-      var a = files.reduce(function(arr, file){
-          if(fs.statSync(file).isFile()){
-            arr.push(file.replace(opts.local + '/', ''));
-          }
-          return arr;
-        }, []);
-
       cb(err,
-        files.map(function(file){
-          if(fs.statSync(file).isFile()){
-            return file.replace(opts.local + '/', '');
-          }
-        })
+        files.reduce(function(arr, file){
+           if(fs.statSync(file).isFile()){
+             arr.push(file.replace(opts.local + '/', ''));
+           }
+           return arr;
+         }, []);
       );
     });
   };
@@ -92,7 +77,7 @@ function s3Files (s3, opts) {
 function formatDataContents (prefix, contents) {
   return contents.map(function (obj) {
     return {
-      key: obj.Key /*.slice(prefix.length + 1)*/,
+      key: obj.Key /*.slice(prefix.length + 1)*/, //TODO do this conditionally
       etag: obj.ETag
     };
   });
