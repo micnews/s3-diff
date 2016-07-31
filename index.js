@@ -6,6 +6,7 @@ var getChanged = require('./lib/changed');
 var intersection = require('lodash.intersection');
 var difference = require('lodash.difference');
 var auto = require('run-auto');
+var glob = require("glob");
 
 module.exports = function (opts, cb) {
   var s3 = new AWS.S3(opts.aws);
@@ -46,13 +47,31 @@ function formatResults (results) {
 }
 
 function localFiles (opts) {
+  //TODO add globbing
   return function (cb) {
-    fs.readdir(opts.local, function (err, files) {
-      if (err && err.code === 'ENOENT') {
-        err = null;
-        files = [];
-      }
-      cb(err, files);
+
+    // fs.readdir(opts.local, function (err, files) {
+    //   if (err && err.code === 'ENOENT') {
+    //     err = null;
+    //     files = [];
+    //   }
+    //   cb(err, files);
+    // });
+    glob(opts.local + "/**/*", function (err, files) {
+      var a = files.reduce(function(arr, file){
+          if(fs.statSync(file).isFile()){
+            arr.push(file.replace(opts.local + '/', ''));
+          }
+          return arr;
+        }, []);
+
+      cb(err,
+        files.map(function(file){
+          if(fs.statSync(file).isFile()){
+            return file.replace(opts.local + '/', '');
+          }
+        })
+      );
     });
   };
 }
@@ -73,7 +92,7 @@ function s3Files (s3, opts) {
 function formatDataContents (prefix, contents) {
   return contents.map(function (obj) {
     return {
-      key: obj.Key.slice(prefix.length + 1),
+      key: obj.Key /*.slice(prefix.length + 1)*/,
       etag: obj.ETag
     };
   });
