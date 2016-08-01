@@ -22,6 +22,7 @@
   "homepage": "https://github.com/micnews/s3-diff#readme",
   "dependencies": {
     "aws-sdk": "^2.2.4",
+    "glob": "^7.0.5",
     "lodash.difference": "^3.2.2",
     "lodash.intersection": "^3.2.0",
     "run-auto": "^1.1.3"
