@@ -6,7 +6,7 @@ var getChanged = require('./lib/changed');
 var intersection = require('lodash.intersection');
 var difference = require('lodash.difference');
 var auto = require('run-auto');
-var glob = require("glob");
+var glob = require('glob');
 
 module.exports = function (opts, cb) {
   var s3 = new AWS.S3(opts.aws);
@@ -48,14 +48,14 @@ function formatResults (results) {
 
 function localFiles (opts) {
   return function (cb) {
-    glob(opts.local + "/**/*", function (err, files) {
+    glob(opts.local + '/**/*', function (err, files) {
       cb(err,
-        files.reduce(function(arr, file){
-           if(fs.statSync(file).isFile()){
-             arr.push(file.replace(opts.local + '/', ''));
-           }
-           return arr;
-         }, [])
+        files.reduce(function (arr, file) {
+          if (fs.statSync(file).isFile()) {
+            arr.push(file.replace(opts.local + '/', ''));
+          }
+          return arr;
+        }, [])
       );
     });
   };
