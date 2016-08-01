@@ -77,7 +77,7 @@ function s3Files (s3, opts) {
 function formatDataContents (prefix, contents) {
   return contents.map(function (obj) {
     return {
-      key: obj.Key /*.slice(prefix.length + 1)*/, //TODO do this conditionally
+      key: prefix ? obj.Key.slice(prefix.length + 1) : obj.Key,
       etag: obj.ETag
     };
   });
