@@ -7,6 +7,7 @@ var intersection = require('lodash.intersection');
 var difference = require('lodash.difference');
 var auto = require('run-auto');
 var glob = require('glob');
+var path = require('path');
 
 module.exports = function (opts, cb) {
   var s3 = new AWS.S3(opts.aws);
@@ -52,7 +53,7 @@ function localFiles (opts) {
       cb(err,
         files.reduce(function (arr, file) {
           if (fs.statSync(file).isFile()) {
-            arr.push(file.replace(opts.local + '/', ''));
+            arr.push(path.relative(opts.local, file));
           }
           return arr;
         }, [])
