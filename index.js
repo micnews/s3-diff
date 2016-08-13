@@ -23,7 +23,7 @@ module.exports = function (opts, cb) {
       );
     } ]
   }, function (err, results) {
-    cb(err, results && formatResults(results));
+    cb(err, results.localFiles && results.s3Files && formatResults(results));
   });
 };
 
@@ -70,6 +70,7 @@ function s3Files (s3, opts) {
     };
 
     s3.listObjects(params, function (err, data) {
+      if(err){return cb(err);}
       cb(err, data.Contents && formatDataContents(opts.remote.prefix, data.Contents));
     });
   };
