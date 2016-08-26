@@ -48,18 +48,30 @@ function formatResults (results) {
 }
 
 function localFiles (opts) {
-  return function (cb) {
-    glob(opts.local + '/**/*', function (err, files) {
-      cb(err,
-        files.reduce(function (arr, file) {
-          if (fs.statSync(file).isFile()) {
-            arr.push(path.relative(opts.local, file));
-          }
-          return arr;
-        }, [])
-      );
-    });
-  };
+  if (opts.recursive) {
+    return function (cb) {
+      glob(opts.local + '/**/*', function (err, files) {
+        cb(err,
+          files.reduce(function (arr, file) {
+            if (fs.statSync(file).isFile()) {
+              arr.push(path.relative(opts.local, file));
+            }
+            return arr;
+          }, [])
+        );
+      });
+    };
+  } else {
+    return function (cb) {
+      fs.readdir(opts.local, function (err, files) {
+        if (err && err.code === 'ENOENT') {
+          err = null;
+          files = [];
+        }
+        cb(err, files);
+      });
+    };
+  }
 }
 
 function s3Files (s3, opts) {
@@ -70,7 +82,7 @@ function s3Files (s3, opts) {
     };
 
     s3.listObjects(params, function (err, data) {
-      if(err){return cb(err);}
+      if (err) { return cb(err); }
       cb(err, data.Contents && formatDataContents(opts.remote.prefix, data.Contents));
     });
   };
