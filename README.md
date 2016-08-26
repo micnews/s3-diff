@@ -20,7 +20,10 @@ s3diff({
   remote: {
     bucket: 'name-of-s3-bucket',
     prefix: 'name/of/folder/to/sync/on/s3'
-  }
+  },
+  // If recursive flag is set to true, s3-diff will recursively diff child
+  // folders as well as the top level folder.
+  recursive: false
 }, function (err, data) {
   // data is an object with the following properties:
   //  changed: Files that have been changed - files that exists in both s3 & locally but are out of sync

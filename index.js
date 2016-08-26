@@ -6,6 +6,8 @@ var getChanged = require('./lib/changed');
 var intersection = require('lodash.intersection');
 var difference = require('lodash.difference');
 var auto = require('run-auto');
+var glob = require('glob');
+var path = require('path');
 
 module.exports = function (opts, cb) {
   var s3 = new AWS.S3(opts.aws);
@@ -21,7 +23,7 @@ module.exports = function (opts, cb) {
       );
     } ]
   }, function (err, results) {
-    cb(err, results && formatResults(results));
+    cb(err, results.localFiles && results.s3Files && formatResults(results));
   });
 };
 
@@ -46,15 +48,30 @@ function formatResults (results) {
 }
 
 function localFiles (opts) {
-  return function (cb) {
-    fs.readdir(opts.local, function (err, files) {
-      if (err && err.code === 'ENOENT') {
-        err = null;
-        files = [];
-      }
-      cb(err, files);
-    });
-  };
+  if (opts.recursive) {
+    return function (cb) {
+      glob(opts.local + '/**/*', function (err, files) {
+        cb(err,
+          files.reduce(function (arr, file) {
+            if (fs.statSync(file).isFile()) {
+              arr.push(path.relative(opts.local, file));
+            }
+            return arr;
+          }, [])
+        );
+      });
+    };
+  } else {
+    return function (cb) {
+      fs.readdir(opts.local, function (err, files) {
+        if (err && err.code === 'ENOENT') {
+          err = null;
+          files = [];
+        }
+        cb(err, files);
+      });
+    };
+  }
 }
 
 function s3Files (s3, opts) {
@@ -65,6 +82,7 @@ function s3Files (s3, opts) {
     };
 
     s3.listObjects(params, function (err, data) {
+      if (err) { return cb(err); }
       cb(err, data.Contents && formatDataContents(opts.remote.prefix, data.Contents));
     });
   };
@@ -73,7 +91,7 @@ function s3Files (s3, opts) {
 function formatDataContents (prefix, contents) {
   return contents.map(function (obj) {
     return {
-      key: obj.Key.slice(prefix.length + 1),
+      key: prefix ? obj.Key.slice(prefix.length + 1) : obj.Key,
       etag: obj.ETag
     };
   });
