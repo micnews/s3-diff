@@ -1,5 +1,5 @@
 {
-  "name": "s3-diff",
+  "name": "@rlyle1179/s3-diff",
   "version": "1.1.0",
   "description": "Get the diff between a s3-folder and a local folder",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/micnews/s3-diff.git"
+    "url": "git+https://github.com/rlyle1179/s3-diff.git"
   },
   "keywords": [
     "s3",
@@ -17,9 +17,9 @@
   "author": "mic.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/micnews/s3-diff/issues"
+    "url": "https://github.com/rlyle1179/s3-diff/issues"
   },
-  "homepage": "https://github.com/micnews/s3-diff#readme",
+  "homepage": "https://github.com/rlyle1179/s3-diff#readme",
   "dependencies": {
     "aws-sdk": "^2.2.4",
     "glob": "^7.0.5",
