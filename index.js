@@ -50,7 +50,7 @@ function formatResults (results) {
 function localFiles (opts) {
   if (opts.recursive) {
     return function (cb) {
-      glob(opts.local + '/**/*', function (err, files) {
+      glob(opts.local + '/**/*', opts.globOpts || {}, function (err, files) {
         cb(err,
           files.reduce(function (arr, file) {
             if (fs.statSync(file).isFile()) {
